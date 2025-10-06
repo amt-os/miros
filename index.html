@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Project AMT-OS</title>
+    <style>
+        body {
+            line-height: 35px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: black; 
+            color: white; 
+            text-align: center; 
+        }
+        h1 {
+            font-weight: bold;
+        }
+        .logo {
+            width: 210px; 
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
+        .image {
+            width: 400px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
+        .miros {
+            width: 100px;
+            height: auto;
+            margin: auto;
+        }
+        .content {
+            max-width: 800px; 
+            margin: 0 auto; 
+            text-align: justify; 
+        }
+        .adresses {
+            max-width: 800px; 
+            margin: 0 auto; 
+            font-size: 15px;
+            text-align: justify; 
+        }
+        .side-header {
+            max-width: 800px; 
+            margin: 0 auto; 
+            font-size: 20px;
+            text-align: justify;
+            font-weight: bold;
+        }
+        #slogan {
+            margin: 20px 0; 
+            font-size: 24px; 
+            opacity: 0; 
+            transition: opacity 0.1s; 
+            display: inline-block; 
+        }
+        #button-word {
+            color: #FF5733; 
+            font-weight: bold; 
+            display: inline-block; 
+            transition: transform 0.3s, box-shadow 0.3s; 
+        }
+        #button-word.pressed {
+            transform: scale(0.9); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); 
+        }
+        .small-images {
+            display: inline-flex; 
+            align-items: center; 
+            margin-left: 10px; 
+        }
+        .small-images img {
+            width: 35px; 
+            height: auto; 
+            margin: 0 5px; 
+            opacity: 0; /* Standardmäßig unsichtbar */
+            transition: opacity 0.5s; /* Sanfter Übergang */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Study Project AMT-OS</h1>
+
+    <img src="images/MirosLogoIdeeTransBG.png" alt="Logo" class="logo"> 
+
+    <div style="display: inline-block;">
+        <p id="slogan"> 
+            From clicking a <span id="button-word">button</span> to playing it yourself 
+        </p>
+        <div class="small-images">
+            <img src="images/note1weiß.png" alt="Bild 1">
+            <img src="images/note2weiß.png" alt="Bild 2">
+            <img src="images/note3weiß.png" alt="Bild 3">
+        </div>
+    </div>
+
+    <!-- Das Bild ist jetzt eine Ebene unter dem Slogan -->
+    <img src="images/fromPhoneToPlay.png" alt="Beispielbild" class="image"> 
+
+    <div class="content">
+        <p>
+            We're excited to introduce our pioneering web application, born from the enthusiasm and dedication of the “Automatic Music Transcription” study project that started in the summer semester of 2024 at the University of Osnabrück.
+            Whether for digital music production, providing sheet music for orchestras, or for personal hobbies, the goal of our project is to enable an effortless way to record or upload audio files, 
+            which are then transformed into MIDI and MusicXML (MXL) formats using advanced machine learning techniques. 
+            As we continue to enhance this project as a <b>Study Initiative </b>  <img src="images\MirosLogo.png" alt="Miros Logo" class="miros">, we invite you to join us on this creative journey. 
+            Your feedback, participation, and support are invaluable as we refine our tools and explore the future of music together. <br> <br>
+            Welcome to the community! <br> <br>
+        </p>
+    </div>
+
+    <div style="background-color: white; padding: 20px; text-align: center; margin: 10px 0; border: 1px solid #ccc;">
+        <a href= "http://amt-demo.ikw.uni-osnabrueck.de" target="_blank" style="color: black; text-decoration: none; font-size: 20px; display: block; width: 100%;">Demo Section <br><i> (Currently only reachable from within University Osnabrück local network) </i></a>
+    </div>
+
+    <p> <br> <br> If you are interested, feel free to reach out to us.</p>
+
+    <p class="side-header"> <br> Contact </p>
+    <div class="adresses">
+        <p>
+            Deniz M. Gün (dguen@uos.de) <br>
+            Julian Straatmann (julian.straatmann@googlemail.com) <br>
+            Camp Shelor (wshelor@uni-osnabrueck.de) <br>
+        </p>
+    </div>
+
+    <p class="side-header"> <br> <br> All member and contributors </p>
+    <div class="adresses">
+        <p>
+            Lena Brüggemann; Se-Eun Choi; Deniz M. Gün, Anish H.S., Jens Huth, Paul Koesling, Laura Kühl, Nina Ma, Aaron Rizt, Fernando Riveros, Camp Shelor, Julian Straatmann, Arman Taghizadeh
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slogan = document.getElementById("slogan");
+            const buttonWord = document.getElementById("button-word");
+            const smallImages = document.querySelector('.small-images'); // Wählt den Container der kleinen Bilder
+            const images = smallImages.querySelectorAll('img'); // Wählt alle kleinen Bilder
+            
+            // Zeigt den Slogan nach einer kurzen Verzögerung an
+            setTimeout(() => {
+                slogan.style.opacity = 1; // Slogan wird sichtbar
+
+                // Fügt den "Pressed" Effekt nach einer Verzögerung von 300 ms hinzu
+                setTimeout(() => {
+                    buttonWord.classList.add("pressed");
+                    setTimeout(() => {
+                        buttonWord.classList.remove("pressed");
+                    }, 200); // Entfernt den Effekt nach 200 Millisekunden
+                }, 1000); // Verzögerung des Effekts von 300 Millisekunden
+
+                // Lässt die kleinen Bilder nacheinander erscheinen
+                images.forEach((img, index) => {
+                    setTimeout(() => {
+                        img.style.opacity = 1; // Macht das Bild sichtbar
+                    }, 1500 + index * 200); // Verzögerung für jedes Bild
+                });
+
+            }, 1000); // 1,5 Sekunden Verzögerung für das Einblenden des Slogans
+        });
+    </script>
+           
+
+</body>
+</html>
