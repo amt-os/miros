@@ -5,29 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Project AMT-OS</title>
     <style>
+        header {
+            background: linear-gradient(180deg, #2b2b5a 0%, #1E1E3A 100%);
+            padding: 60px 20px 40px;
+            text-align: center;
+        }
+        .about {
+            max-width: 800px;
+            margin: 60px auto;
+            background: rgba(255,255,255,0.05);  /* subtle glassy feel */
+            padding: 10px 30px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .about:hover {
+            transform: translateY(-3px);
+        }
+
+        .about h3 {
+            color: #fff;
+            font-size: 26px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .about p {
+            color: #e6e6e6;
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+        
         body {
             line-height: 35px;
             font-family: Arial, sans-serif;
             font-size: 20px;
             margin: 0;
             padding: 20px;
-            background-color: black; 
+            background-color: #1E1E3A; 
             color: white; 
             text-align: center; 
         }
         h1 {
             font-weight: bold;
+            margin: 0 0 10px;
+        }
+        h2 {
+            margin: 10px 0 15px;
         }
         .logo {
             width: 210px; 
             height: auto;
-            margin: 20px auto;
-            display: block;
-        }
-        .image {
-            width: 400px;
-            height: auto;
-            margin: 20px auto;
+            margin: 10px auto 20px;
             display: block;
         }
         .miros {
@@ -40,6 +72,7 @@
             margin: 0 auto; 
             text-align: justify; 
         }
+        
         .adresses {
             max-width: 800px; 
             margin: 0 auto; 
@@ -61,7 +94,7 @@
             display: inline-block; 
         }
         #button-word {
-            color: #FF5733; 
+            color: #1E1E3A; 
             font-weight: bold; 
             display: inline-block; 
             transition: transform 0.3s, box-shadow 0.3s; 
@@ -70,103 +103,159 @@
             transform: scale(0.9); 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); 
         }
-        .small-images {
-            display: inline-flex; 
-            align-items: center; 
-            margin-left: 10px; 
+        .resources-section {
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+            border: 1px solid #ccc;
         }
-        .small-images img {
-            width: 35px; 
-            height: auto; 
-            margin: 0 5px; 
-            opacity: 0; /* Standardmäßig unsichtbar */
-            transition: opacity 0.5s; /* Sanfter Übergang */
+        .resources-section a {
+            color: black;
+            text-decoration: none;
+            font-size: 20px;
         }
     </style>
+
+
 </head>
+
+<script>
+let slideIndex = 0;
+const slides = document.getElementsByClassName("slide");
+
+function showSlide(n) {
+  for (let i = 0; i < slides.length; i++) {
+    slides[i].style.display = "none";
+  }
+  slides[n].style.display = "block";
+}
+
+function plusSlides(n) {
+  slideIndex = (slideIndex + n + slides.length) % slides.length;
+  showSlide(slideIndex);
+}
+
+// optional: auto-cycle every 6s
+setInterval(() => plusSlides(1), 6000);
+</script>
+
+
 <body>
+    <header>
+    <img src="images/miros_logo_trans.png" alt="MIROS Logo" class="logo"> 
+    <h2>Music Information Retrieval Osnabrück</h2>
+    <hr>
+    </header>
 
-    <h1>Study Project AMT-OS</h1>
+    
+    <main>
+    <section class="about">
+  <h3>What is MIROS?</h3>
 
-    <img src="images/MirosLogoIdeeTransBG.png" alt="Logo" class="logo"> 
+  <p>
+    We’re a student-run organization at the University of Osnabrück exploring the intersections of 
+    <strong>music</strong>, <strong>computer science</strong>, <strong>neuroscience</strong>, 
+    <strong>psychology</strong>, and <strong>cognitive science</strong>.
+  </p>
 
-    <div style="display: inline-block;">
-        <p id="slogan"> 
-            From clicking a <span id="button-word">button</span> to playing it yourself 
-        </p>
-        <div class="small-images">
-            <img src="images/note1weiß.png" alt="Bild 1">
-            <img src="images/note2weiß.png" alt="Bild 2">
-            <img src="images/note3weiß.png" alt="Bild 3">
+  <p>
+    Our mission is simple: bring together students who love both <em>music</em> and <em>technology</em> —
+    creating a space to <strong>learn</strong>, <strong>collaborate</strong>, and <strong>build</strong>.
+  </p>
+
+  <p>
+    Whether you’re into <em>machine learning for music</em>, <em>music cognition</em>, 
+    or <em>creative AI</em>, MIROS is your starting point.
+  </p>
+    </section>
+
+
+    <section class="resources resources-section"
+        style="color:#111;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.25);
+                max-width:700px;margin:40px auto;">
+        <h3 style="margin-top:0;color:#1E1E3A;letter-spacing:.3px;">Resources</h3>
+        <p>We keep a <strong>curated list</strong> of MIR entry points:</p>
+        <ul style="text-align:left;margin:0 auto 12px;max-width:640px;line-height:1.6;padding-left: 185px;">
+            <li>Universities, labs, and research groups</li>
+            <li>Starter papers, courses, and datasets</li>
+            <li>Online tools centered around MIR</li>
+        </ul>
+        <p style="margin:0 0 14px;"><em>Use this to find internships, RA roles, or a thesis lab.</em></p>
+        <a href="resources.html" style="display:inline-block;padding:10px 16px;background:#1E1E3A;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold;">
+            Browse the list →
+        </a>
+        <div style="margin-top:10px;font-size:14px;opacity:.85;">[Open to beginners]</div>
+        </section>
+
+        <section id="projects" style="margin:60px auto; max-width:800px; text-align:center;">
+    <h3 style="font-size:26px; color:#fff;">Projects</h3>
+    <p style="font-style:italic; opacity:0.9;">What our members are building and exploring.</p>
+
+    <div class="slideshow-container" style="position:relative; height:220px; margin-top:30px;">
+
+        <div class="slide fade" style="display:block;">
+        <h4 style="color:#FFB;">🎼 BERThoven</h4>
+        <p>A symbolic-music transformer analyzing harmonic structure and musical form.</p>
         </div>
-    </div>
 
-    <!-- Das Bild ist jetzt eine Ebene unter dem Slogan -->
-    <img src="images/fromPhoneToPlay.png" alt="Beispielbild" class="image"> 
+        <div class="slide fade" style="display:none;">
+        <h4 style="color:#FFB;">🎵 Music Foundation Model</h4>
+        <p>Fernando’s project on building a general-purpose music foundation model for audio and symbolic data.</p>
+        </div>
 
-    <div class="content">
+        <div class="slide fade" style="display:none;">
+        <h4 style="color:#FFB;">🎧 Automatic Music Transcription</h4>
+        <p>The original MIROS project — a transformer that turns polyphonic audio into notation.</p>
+        </div>
+
+        <div class="slide fade" style="display:none;">
+        <h4 style="color:#FFB;">🥁 Drum Guitar Hero</h4>
+        <p>Tobi’s interactive rhythm system inspired by Guitar Hero, combining real-time audio and motion tracking.</p>
+        </div>
+
+        <!-- ✨ New "Your Project Here!" Slide -->
+        <div class="slide fade" style="display:none;">
+        <h4 style="color:#FFB;">💡 Your Project Here!</h4>
         <p>
-            We're excited to introduce our pioneering web application, born from the enthusiasm and dedication of the “Automatic Music Transcription” study project that started in the summer semester of 2024 at the University of Osnabrück.
-            Whether for digital music production, providing sheet music for orchestras, or for personal hobbies, the goal of our project is to enable an effortless way to record or upload audio files, 
-            which are then transformed into MIDI and MusicXML (MXL) formats using advanced machine learning techniques. 
-            As we continue to enhance this project as a <b>Study Initiative </b>  <img src="images\MirosLogo.png" alt="Miros Logo" class="miros">, we invite you to join us on this creative journey. 
-            Your feedback, participation, and support are invaluable as we refine our tools and explore the future of music together. <br> <br>
-            Welcome to the community! <br> <br>
+            Got an idea, experiment, or research you’d like to feature?  
+            <a href="mailto:wshelor@uni-osnabrueck.de" 
+            style="color:#fff;text-decoration:underline;">Contact us</a>  
+            to get your project showcased on MIROS.
         </p>
+        </div>
+
     </div>
 
-    <div style="background-color: white; padding: 20px; text-align: center; margin: 10px 0; border: 1px solid #ccc;">
-        <a href= "http://amt-demo.ikw.uni-osnabrueck.de" target="_blank" style="color: black; text-decoration: none; font-size: 20px; display: block; width: 100%;">Demo Section <br><i> (Currently only reachable from within University Osnabrück local network) </i></a>
+    <div style="margin-top:20px;">
+        <button onclick="plusSlides(-1)" style="background:none;border:1px solid #fff;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;">❮</button>
+        <button onclick="plusSlides(1)" style="background:none;border:1px solid #fff;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;">❯</button>
     </div>
+    </section>
+
+
+    <section class="contact">
+      <h3>Contact</h3>
+      <p>If you are interested, feel free to reach out to us.</p>
+      <ul>
+        <li>Camp Shelor – <a href="mailto:wshelor@uni-osnabrueck.de">wshelor@uni-osnabrueck.de</a></li>
+        <li>Deniz M. Gün – <a href="mailto:dguen@uos.de">dguen@uos.de</a></li>
+        <li>Julian Straatmann – <a href="mailto:julian.straatmann@googlemail.com">julian.straatmann@googlemail.com</a></li>
+      </ul>
+    </section>
 
     <p> <br> <br> If you are interested, feel free to reach out to us.</p>
 
     <p class="side-header"> <br> Contact </p>
     <div class="adresses">
         <p>
-            Deniz M. Gün (dguen@uos.de) <br>
-            Julian Straatmann (julian.straatmann@googlemail.com) <br>
             Camp Shelor (wshelor@uni-osnabrueck.de) <br>
-        </p>
-    </div>
-
-    <p class="side-header"> <br> <br> All member and contributors </p>
-    <div class="adresses">
-        <p>
-            Lena Brüggemann; Se-Eun Choi; Deniz M. Gün, Anish H.S., Jens Huth, Paul Koesling, Laura Kühl, Nina Ma, Aaron Rizt, Fernando Riveros, Camp Shelor, Julian Straatmann, Arman Taghizadeh
-        </p>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const slogan = document.getElementById("slogan");
-            const buttonWord = document.getElementById("button-word");
-            const smallImages = document.querySelector('.small-images'); // Wählt den Container der kleinen Bilder
-            const images = smallImages.querySelectorAll('img'); // Wählt alle kleinen Bilder
+            Dr. Ulf Krumnack ()
+            Fernando Riveros ()
+            Deniz M. Gün (dguen@uos.de) <br>
             
-            // Zeigt den Slogan nach einer kurzen Verzögerung an
-            setTimeout(() => {
-                slogan.style.opacity = 1; // Slogan wird sichtbar
-
-                // Fügt den "Pressed" Effekt nach einer Verzögerung von 300 ms hinzu
-                setTimeout(() => {
-                    buttonWord.classList.add("pressed");
-                    setTimeout(() => {
-                        buttonWord.classList.remove("pressed");
-                    }, 200); // Entfernt den Effekt nach 200 Millisekunden
-                }, 1000); // Verzögerung des Effekts von 300 Millisekunden
-
-                // Lässt die kleinen Bilder nacheinander erscheinen
-                images.forEach((img, index) => {
-                    setTimeout(() => {
-                        img.style.opacity = 1; // Macht das Bild sichtbar
-                    }, 1500 + index * 200); // Verzögerung für jedes Bild
-                });
-
-            }, 1000); // 1,5 Sekunden Verzögerung für das Einblenden des Slogans
-        });
-    </script>
-           
+        </p>
+    </div>
 
 </body>
 </html>
