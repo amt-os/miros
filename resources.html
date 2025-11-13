@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labs & Opportunities | MIROS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-sA+e2at/mItp2xbEhDNmE6DGCG1Gs9LFpBBa2+4Dpmw=" crossorigin="">
+    <style>
+        :root {
+            --page-bg: #1E1E3A;
+            --card-bg: #fdfdfd;
+            --ink: #111;
+            --muted: #9ca3c3;
+            --accent: #F26457;
+            --accent-dark: #c04033;
+            --border: rgba(255, 255, 255, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--page-bg);
+            color: #f6f6f6;
+        }
+
+        header.page-header {
+            background: linear-gradient(180deg, #2b2b5a 0%, #1E1E3A 100%);
+            padding: 50px 20px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header .logo {
+            width: 210px;
+            height: auto;
+            display: block;
+            margin: 0 auto 16px;
+        }
+
+        header h1 {
+            margin: 10px 0 0;
+            font-size: 32px;
+            letter-spacing: 0.5px;
+        }
+
+        main.resources-main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 80px;
+        }
+
+        .intro-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 24px 28px 32px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+            text-align: left;
+        }
+
+        .intro-card h2 {
+            margin-top: 0;
+            font-size: 28px;
+            letter-spacing: 0.4px;
+        }
+
+        .intro-card p {
+            line-height: 1.6;
+            color: #f4f4f8;
+        }
+
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--page-bg);
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: fit-content;
+            border: none;
+        }
+
+        .primary-btn:hover,
+        .primary-btn:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .filters-section {
+            margin-top: 32px;
+            background: rgba(10, 10, 32, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 22px 26px;
+        }
+
+        /* Styling hooks: adjust .filters-section, #labs-map, and .lab-card if the global palette changes. */
+        .filters-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .filters-header h3 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 0.3px;
+        }
+
+        .clear-btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .clear-btn:hover,
+        .clear-btn:focus {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .filter-field label {
+            display: block;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .filter-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .filter-field select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .keyword-field {
+            grid-column: 1 / -1;
+        }
+
+        .keyword-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .keyword-chip {
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            background: transparent;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease, border 0.2s ease;
+        }
+
+        .keyword-chip.is-selected {
+            background: #fff;
+            color: var(--page-bg);
+            border-color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .map-section {
+            margin: 40px 0 30px;
+        }
+
+        #labs-map {
+            width: 100%;
+            height: 380px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .results-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .results-meta p {
+            margin: 0;
+            color: #e6e9ff;
+        }
+
+        .labs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .lab-card {
+            background: var(--card-bg);
+            color: var(--ink);
+            border-radius: 18px;
+            padding: 22px 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(17, 17, 17, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        .lab-card.highlight {
+            box-shadow: 0 0 0 3px var(--accent) inset, 0 20px 50px rgba(242, 100, 87, 0.35);
+        }
+
+        .lab-card header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .lab-card h4 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .lab-meta {
+            font-size: 15px;
+            color: #444;
+        }
+
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 16px;
+        }
+
+        .keyword-tag {
+            background: rgba(30, 30, 58, 0.12);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 13px;
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .details-toggle {
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s ease;
+            align-self: flex-start;
+        }
+
+        .details-toggle:hover,
+        .details-toggle:focus {
+            background: var(--accent-dark);
+        }
+
+        .lab-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lab-details a {
+            color: var(--accent-dark);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .lab-details a:hover,
+        .lab-details a:focus {
+            text-decoration: underline;
+        }
+
+        .empty-state,
+        .loading-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #d8daff;
+        }
+
+        @media (max-width: 720px) {
+            header h1 {
+                font-size: 26px;
+            }
+
+            .intro-card {
+                padding: 20px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #labs-map {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="page-header">
+    <img src="images/miros_logo_trans.png" alt="MIROS logo" class="logo">
+    <h1>Labs & Opportunities</h1>
+    <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);">Music Technology & MIR Labs worldwide</p>
+</header>
+
+<main class="resources-main">
+    <section class="intro-card">
+        <h2>Discover research labs, programs, and collaborators.</h2>
+        <p>
+            Use the filters below to browse music information retrieval, music cognition, and audio technology labs,
+            then jump directly to their websites or contact points. Everything stays client-side, so exploring is fast
+            and private.
+        </p>
+        <!-- Submit URL placeholder: replace href on #submit-lab-link or update SUBMIT_FORM_URL in the script below. -->
+        <a id="submit-lab-link" class="primary-btn" href="#">Know a lab we missed? Submit one here.</a>
+    </section>
+
+    <section class="filters-section" aria-labelledby="filters-title">
+        <div class="filters-header">
+            <h3 id="filters-title">Filter labs</h3>
+            <button id="clear-filters" class="clear-btn" type="button">Clear filters</button>
+        </div>
+        <div class="filters-grid">
+            <div class="filter-field">
+                <label for="country-filter">Country</label>
+                <select id="country-filter">
+                    <option value="">All countries</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="city-filter">City</label>
+                <select id="city-filter" disabled>
+                    <option value="">All cities</option>
+                </select>
+            </div>
+            <div class="filter-field keyword-field">
+                <label for="keyword-filters">Keywords</label>
+                <div id="keyword-filters" class="keyword-chips" role="group" aria-label="Keyword filters"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="map-section">
+        <h3 style="margin-bottom:12px;">Map view</h3>
+        <div id="labs-map" role="region" aria-label="Map of MIR labs"></div>
+    </section>
+
+    <div class="results-meta">
+        <p id="labs-count">Loading labs…</p>
+    </div>
+
+    <section id="labs-list" class="labs-list" aria-live="polite">
+        <p class="loading-state">Loading labs…</p>
+    </section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-o9N1j7k8f4N1vNjeJDfVvKuhW/T+m1kG2Jf2Q6pCw0k="
+        crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const CSV_SOURCE = new URL('./data/mir_labs.csv', window.location.href).href; // Change this path if the CSV moves to a different folder.
+        const SUBMIT_FORM_URL = '#'; // Update this URL when you have the final submission form ready.
+
+        const state = {
+            labs: [],
+            filteredLabs: [],
+            map: null,
+            markerLayer: null,
+            selectedCountry: '',
+            selectedCity: '',
+            selectedKeywords: new Set(),
+            keywordList: [],
+        };
+
+        const dom = {
+            submitLink: document.getElementById('submit-lab-link'),
+            countrySelect: document.getElementById('country-filter'),
+            citySelect: document.getElementById('city-filter'),
+            keywordContainer: document.getElementById('keyword-filters'),
+            clearButton: document.getElementById('clear-filters'),
+            labsList: document.getElementById('labs-list'),
+            labsCount: document.getElementById('labs-count'),
+        };
+
+        dom.submitLink.href = SUBMIT_FORM_URL;
+
+        init();
+
+        async function init() {
+            if (typeof Papa === 'undefined') {
+                throw new Error('PapaParse failed to load. Check the CDN connection or script tag.');
+            }
+            try {
+                await loadLabsData();
+                initMap();
+                initFilters();
+                applyFilters();
+            } catch (error) {
+                console.error('Failed to load labs data:', error);
+                dom.labsList.innerHTML = `<p class="empty-state">Sorry, something went wrong while loading the labs.<br>${error.message}</p>`;
+                dom.labsCount.textContent = 'Unable to load labs right now.';
+            }
+        }
+
+        async function loadLabsData() {
+            if (window.location.protocol === 'file:') {
+                console.warn('Loading over file:// can block CSV requests. Run a local server for full functionality.');
+            }
+            const response = await fetch(CSV_SOURCE, {cache: 'no-cache'});
+            if (!response.ok) {
+                throw new Error(`CSV request failed (${response.status})`);
+            }
+            const csvText = await response.text();
+            const results = Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+            });
+
+            if (results.errors && results.errors.length) {
+                console.warn('Some CSV rows produced warnings:', results.errors);
+            }
+
+            state.labs = results.data
+                .map((row, index) => formatLabRow(row, index))
+                .filter(lab => lab.labName);
+
+            state.keywordList = Array.from(
+                new Set(
+                    state.labs.flatMap(lab => lab.keywords)
+                )
+            ).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+            return state.labs;
+        }
+
+        function formatLabRow(row, index) {
+            const normalizedRow = {};
+            Object.keys(row).forEach((key) => {
+                if (!key) return;
+                const value = row[key];
+                const trimmed = key.trim();
+                const compact = trimmed.replace(/\s+/g, '');
+                normalizedRow[trimmed] = value;
+                normalizedRow[compact] = value;
+                normalizedRow[trimmed.toLowerCase()] = value;
+                normalizedRow[compact.toLowerCase()] = value;
+            });
+
+            const valueFor = (...keys) => {
+                for (const key of keys) {
+                    const trimmed = key.trim();
+                    const compact = trimmed.replace(/\s+/g, '');
+                    const candidates = [
+                        trimmed,
+                        compact,
+                        trimmed.toLowerCase(),
+                        compact.toLowerCase(),
+                    ];
+                    for (const candidate of candidates) {
+                        if (normalizedRow[candidate] !== undefined && normalizedRow[candidate] !== '') {
+                            return normalizedRow[candidate];
+                        }
+                    }
+                }
+                return '';
+            };
+
+            const parseNumber = (value) => {
+                const num = parseFloat(value);
+                return Number.isFinite(num) ? num : null;
+            };
+
+            const rawKeywords = valueFor('Keywords');
+            const keywords = rawKeywords
+                ? rawKeywords.split(/[;,]/).map((kw) => kw.trim()).filter(Boolean)
+                : [];
+
+            return {
+                id: `lab-${index}`,
+                labName: valueFor('LabName', 'Lab Name'),
+                institution: valueFor('Institution'),
+                country: valueFor('Country'),
+                city: valueFor('City'),
+                specifics: valueFor('Specifics', 'Description'),
+                website: valueFor('Website'),
+                contactPerson: valueFor('ContactPerson', 'Contact Person'),
+                contactInfo: valueFor('ContactInfo', 'Contact Info'),
+                keywords,
+                latitude: parseNumber(valueFor('Latitude', 'Lat')),
+                longitude: parseNumber(valueFor('Longitude', 'Lon', 'Lng')),
+            };
+        }
+
+        function initFilters() {
+            populateCountryOptions();
+            populateKeywordChips();
+
+            dom.countrySelect.addEventListener('change', () => {
+                state.selectedCountry = dom.countrySelect.value;
+                state.selectedCity = '';
+                dom.citySelect.value = '';
+                updateCityOptions();
+                applyFilters();
+            });
+
+            dom.citySelect.addEventListener('change', () => {
+                state.selectedCity = dom.citySelect.value;
+                applyFilters();
+            });
+
+            dom.clearButton.addEventListener('click', clearFilters);
+        }
+
+        function populateCountryOptions() {
+            const countries = Array.from(
+                new Set(state.labs.map((lab) => lab.country).filter(Boolean))
+            ).sort((a, b) => a.localeCompare(b));
+
+            dom.countrySelect.innerHTML = '<option value="">All countries</option>';
+            countries.forEach((country) => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                dom.countrySelect.appendChild(option);
+            });
+        }
+
+        function updateCityOptions() {
+            dom.citySelect.innerHTML = '<option value="">All cities</option>';
+            if (!state.selectedCountry) {
+                dom.citySelect.disabled = true;
+                return;
+            }
+
+            const cities = Array.from(
+                new Set(
+                    state.labs
+                        .filter((lab) => lab.country === state.selectedCountry && lab.city)
+                        .map((lab) => lab.city)
+                )
+            ).sort((a, b) => a.localeCompare(b));
+
+            cities.forEach((city) => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                dom.citySelect.appendChild(option);
+            });
+            dom.citySelect.disabled = false;
+        }
+
+        function populateKeywordChips() {
+            dom.keywordContainer.innerHTML = '';
+            if (!state.keywordList.length) {
+                dom.keywordContainer.textContent = 'Keywords will appear once data loads.';
+                return;
+            }
+
+            state.keywordList.forEach((keyword) => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'keyword-chip';
+                chip.textContent = keyword;
+                chip.dataset.keyword = keyword;
+                chip.addEventListener('click', () => toggleKeyword(keyword, chip));
+                dom.keywordContainer.appendChild(chip);
+            });
+        }
+
+        function toggleKeyword(keyword, chip) {
+            if (state.selectedKeywords.has(keyword)) {
+                state.selectedKeywords.delete(keyword);
+                chip.classList.remove('is-selected');
+            } else {
+                state.selectedKeywords.add(keyword);
+                chip.classList.add('is-selected');
+            }
+            applyFilters();
+        }
+
+        function clearFilters() {
+            state.selectedCountry = '';
+            state.selectedCity = '';
+            state.selectedKeywords.clear();
+
+            dom.countrySelect.value = '';
+            dom.citySelect.value = '';
+            dom.citySelect.disabled = true;
+
+            dom.keywordContainer.querySelectorAll('.keyword-chip').forEach((chip) => {
+                chip.classList.remove('is-selected');
+            });
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let labs = [...state.labs];
+
+            if (state.selectedCountry) {
+                labs = labs.filter((lab) => lab.country === state.selectedCountry);
+            }
+
+            if (state.selectedCity) {
+                labs = labs.filter(
+                    (lab) => lab.country === state.selectedCountry && lab.city === state.selectedCity
+                );
+            }
+
+            if (state.selectedKeywords.size) {
+                labs = labs.filter((lab) =>
+                    lab.keywords.some((keyword) => state.selectedKeywords.has(keyword))
+                );
+            }
+
+            state.filteredLabs = labs;
+            renderLabCards(labs);
+            updateMapMarkers(labs);
+
+            const count = labs.length;
+            dom.labsCount.textContent = count === 1
+                ? 'Showing 1 lab'
+                : `Showing ${count} labs`;
+        }
+
+        function renderLabCards(labs) {
+            dom.labsList.innerHTML = '';
+
+            if (!labs.length) {
+                dom.labsList.innerHTML = '<p class="empty-state">No labs match your filters yet. Try a broader search.</p>';
+                return;
+            }
+
+            labs.forEach((lab) => {
+                const card = document.createElement('article');
+                card.className = 'lab-card';
+                card.dataset.labId = lab.id;
+
+                const header = document.createElement('header');
+                const title = document.createElement('h4');
+                title.textContent = lab.labName;
+                const subtitle = document.createElement('div');
+                subtitle.className = 'lab-meta';
+                subtitle.textContent = [
+                    lab.institution,
+                    [lab.city, lab.country].filter(Boolean).join(', ')
+                ].filter(Boolean).join(' · ');
+
+                header.appendChild(title);
+                header.appendChild(subtitle);
+
+                const keywordWrap = document.createElement('div');
+                keywordWrap.className = 'keyword-tags';
+                lab.keywords.forEach((keyword) => {
+                    const tag = document.createElement('span');
+                    tag.className = 'keyword-tag';
+                    tag.textContent = keyword;
+                    keywordWrap.appendChild(tag);
+                });
+
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'details-toggle';
+                toggle.textContent = 'Show details';
+                toggle.setAttribute('aria-expanded', 'false');
+
+                const details = buildDetailsBlock(lab);
+                details.hidden = true;
+
+                toggle.addEventListener('click', () => {
+                    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                    toggle.setAttribute('aria-expanded', String(!expanded));
+                    toggle.textContent = expanded ? 'Show details' : 'Hide details';
+                    details.hidden = expanded;
+
+                    if (!expanded && hasCoordinates(lab) && state.map) {
+                        state.map.panTo([lab.latitude, lab.longitude]);
+                    }
+                });
+
+                card.appendChild(header);
+                if (lab.keywords.length) {
+                    card.appendChild(keywordWrap);
+                }
+                card.appendChild(toggle);
+                card.appendChild(details);
+
+                dom.labsList.appendChild(card);
+            });
+        }
+
+        function buildDetailsBlock(lab) {
+            const container = document.createElement('div');
+            container.className = 'lab-details';
+
+            if (lab.specifics) {
+                const description = document.createElement('p');
+                description.textContent = lab.specifics;
+                container.appendChild(description);
+            }
+
+            if (lab.contactPerson || lab.contactInfo) {
+                const contact = document.createElement('p');
+                if (lab.contactPerson) {
+                    contact.appendChild(document.createTextNode(lab.contactPerson));
+                }
+                if (lab.contactInfo) {
+                    if (lab.contactPerson) {
+                        contact.appendChild(document.createTextNode(' – '));
+                    }
+                    if (isEmail(lab.contactInfo)) {
+                        const emailLink = document.createElement('a');
+                        emailLink.href = `mailto:${lab.contactInfo}`;
+                        emailLink.textContent = lab.contactInfo;
+                        contact.appendChild(emailLink);
+                    } else {
+                        contact.appendChild(document.createTextNode(lab.contactInfo));
+                    }
+                }
+                container.appendChild(contact);
+            }
+
+            if (lab.website) {
+                const website = document.createElement('a');
+                website.href = lab.website;
+                website.target = '_blank';
+                website.rel = 'noopener';
+                website.textContent = 'Visit lab website';
+                container.appendChild(website);
+            }
+
+            return container;
+        }
+
+        function initMap() {
+            state.map = L.map('labs-map', {
+                center: [20, 0],
+                zoom: 2,
+                scrollWheelZoom: false,
+                worldCopyJump: true,
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(state.map);
+
+            state.markerLayer = L.layerGroup().addTo(state.map);
+        }
+
+        function updateMapMarkers(labs) {
+            if (!state.markerLayer) return;
+            state.markerLayer.clearLayers();
+
+            const coordinates = [];
+
+            labs.forEach((lab) => {
+                if (!hasCoordinates(lab)) {
+                    return;
+                }
+
+                const marker = L.circleMarker([lab.latitude, lab.longitude], {
+                    radius: 6,
+                    color: '#f23d3d',
+                    weight: 1.2,
+                    fillColor: '#ff7b7b',
+                    fillOpacity: 0.9,
+                }).addTo(state.markerLayer);
+
+                marker.bindPopup(`
+                    <strong>${lab.labName}</strong><br/>
+                    ${lab.institution || ''}<br/>
+                    ${[lab.city, lab.country].filter(Boolean).join(', ')}
+                `);
+
+                marker.on('click', () => focusCard(lab.id));
+
+                coordinates.push([lab.latitude, lab.longitude]);
+            });
+
+            if (!coordinates.length) {
+                state.map.setView([20, 0], 2);
+                return;
+            }
+
+            if (coordinates.length === 1) {
+                state.map.setView(coordinates[0], 4);
+            } else {
+                const bounds = L.latLngBounds(coordinates);
+                state.map.fitBounds(bounds, {padding: [20, 20]});
+            }
+        }
+
+        function focusCard(labId) {
+            const card = dom.labsList.querySelector(`.lab-card[data-lab-id="${labId}"]`);
+            if (!card) return;
+            card.scrollIntoView({behavior: 'smooth', block: 'center'});
+            card.classList.add('highlight');
+            setTimeout(() => card.classList.remove('highlight'), 1800);
+        }
+
+        function isEmail(value) {
+            return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
+        }
+
+        function hasCoordinates(lab) {
+            return typeof lab.latitude === 'number' && typeof lab.longitude === 'number';
+        }
+    });
+</script>
+</body>
+</html>
