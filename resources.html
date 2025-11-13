@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Labs & Opportunities | MIROS</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-sA+e2at/mItp2xbEhDNmE6DGCG1Gs9LFpBBa2+4Dpmw=" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
         :root {
             --page-bg: #1E1E3A;
@@ -206,6 +205,13 @@
             overflow: hidden;
         }
 
+        .map-status {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            min-height: 18px;
+        }
+
         .results-meta {
             display: flex;
             align-items: center;
@@ -353,11 +359,10 @@
         <h2>Discover research labs, programs, and collaborators.</h2>
         <p>
             Use the filters below to browse music information retrieval, music cognition, and audio technology labs,
-            then jump directly to their websites or contact points. Everything stays client-side, so exploring is fast
-            and private.
+            then jump directly to their websites or contact points.
         </p>
         <!-- Submit URL placeholder: replace href on #submit-lab-link or update SUBMIT_FORM_URL in the script below. -->
-        <a id="submit-lab-link" class="primary-btn" href="#">Know a lab we missed? Submit one here.</a>
+        <a id="submit-lab-link" class="primary-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSexyaECUGUAFdDZhD5eT8Z-HXQoY1xjTNbe1PvebZhAVHpeng/viewform?usp=header" target="_blank" rel="noopener noreferrer">Know a lab we missed? Submit one here.</a>
     </section>
 
     <section class="filters-section" aria-labelledby="filters-title">
@@ -388,6 +393,7 @@
     <section class="map-section">
         <h3 style="margin-bottom:12px;">Map view</h3>
         <div id="labs-map" role="region" aria-label="Map of MIR labs"></div>
+        <p id="map-status" class="map-status" role="status" aria-live="polite"></p>
     </section>
 
     <div class="results-meta">
@@ -406,6 +412,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const CSV_SOURCE = new URL('./data/mir_labs.csv', window.location.href).href; // Change this path if the CSV moves to a different folder.
+        const LEAFLET_FALLBACK_SRC = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'; // Use if the primary Leaflet CDN fails.
         const SUBMIT_FORM_URL = '#'; // Update this URL when you have the final submission form ready.
 
         const state = {
@@ -427,6 +434,8 @@
             clearButton: document.getElementById('clear-filters'),
             labsList: document.getElementById('labs-list'),
             labsCount: document.getElementById('labs-count'),
+            mapContainer: document.getElementById('labs-map'),
+            mapStatus: document.getElementById('map-status'),
         };
 
         dom.submitLink.href = SUBMIT_FORM_URL;
@@ -439,13 +448,24 @@
             }
             try {
                 await loadLabsData();
-                initMap();
+                await attemptMapInit();
                 initFilters();
                 applyFilters();
             } catch (error) {
                 console.error('Failed to load labs data:', error);
                 dom.labsList.innerHTML = `<p class="empty-state">Sorry, something went wrong while loading the labs.<br>${error.message}</p>`;
                 dom.labsCount.textContent = 'Unable to load labs right now.';
+            }
+        }
+
+        async function attemptMapInit() {
+            if (!dom.mapContainer) return;
+            try {
+                await ensureLeafletLoaded();
+                initMap();
+            } catch (mapError) {
+                console.warn('Map unavailable, continuing without it.', mapError);
+                dom.mapContainer.innerHTML = `<p class="empty-state" style="color:#fff;">Map unavailable: ${mapError.message}</p>`;
             }
         }
 
@@ -793,6 +813,39 @@
             state.markerLayer = L.layerGroup().addTo(state.map);
         }
 
+        function ensureLeafletLoaded() {
+            if (typeof L !== 'undefined') {
+                return Promise.resolve();
+            }
+            return loadExternalScript(LEAFLET_FALLBACK_SRC).then(() => {
+                if (typeof L === 'undefined') {
+                    throw new Error('Leaflet library failed to load from both CDNs.');
+                }
+            });
+        }
+
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
+                if (!src) {
+                    reject(new Error('No script source provided.'));
+                    return;
+                }
+                const existing = document.querySelector(`script[data-dynamic-src="${src}"]`);
+                if (existing) {
+                    existing.addEventListener('load', resolve, {once: true});
+                    existing.addEventListener('error', () => reject(new Error(`Failed loading ${src}`)), {once: true});
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.setAttribute('data-dynamic-src', src);
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+                document.head.appendChild(script);
+            });
+        }
+
         function updateMapMarkers(labs) {
             if (!state.markerLayer) return;
             state.markerLayer.clearLayers();
@@ -825,6 +878,8 @@
 
             if (!coordinates.length) {
                 state.map.setView([20, 0], 2);
+                updateMapStatus('No map markers for the current filters yet.');
+                state.map.invalidateSize();
                 return;
             }
 
@@ -834,6 +889,8 @@
                 const bounds = L.latLngBounds(coordinates);
                 state.map.fitBounds(bounds, {padding: [20, 20]});
             }
+            updateMapStatus('');
+            state.map.invalidateSize();
         }
 
         function focusCard(labId) {
@@ -850,6 +907,11 @@
 
         function hasCoordinates(lab) {
             return typeof lab.latitude === 'number' && typeof lab.longitude === 'number';
+        }
+
+        function updateMapStatus(message) {
+            if (!dom.mapStatus) return;
+            dom.mapStatus.textContent = message;
         }
     });
 </script>
